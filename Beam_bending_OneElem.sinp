@@ -1,0 +1,37 @@
+**Beam Bending
+**
+*Node
+1,  0.0,  0.0
+2, 10.0,  0.0
+3, 10.0, 20.0
+4,  0.0, 20.0
+*Element, type=CPS4
+1,  1,  2, 3, 4
+**
+**Define sets
+*Nset, nset=Loadnode
+3
+*Nset, nset=BCX
+1, 2
+*Nset, nset=BCY
+1, 2
+**
+*Materials, name=Steel
+*Elastic
+2.8e+07, 0.3
+**
+** BOUNDARY CONDITIONS
+**
+*Boundary
+BCX, 1
+BCY, 2
+**
+** LOADS
+** 
+*Cload
+Loadnode, 1, 0.
+Loadnode, 2, 1.5e+06
+**
+** OUTPUT REQUESTS
+**
+*Output, field, variable=U
