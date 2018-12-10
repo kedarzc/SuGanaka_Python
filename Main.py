@@ -7,6 +7,7 @@ from numpy.linalg import inv
 
 # The name of the input file
 input_file = 'Beam_bending.sinp'
+name_ip_file = input_file[:-5]
 
 # Read entire input file
 all_lines = STDLIB.readFile(input_file)
@@ -153,9 +154,9 @@ delta = inv(KK).dot(force_global)
 # -----------------------------------------------
 node_disp = STDLIB.seprarate_disp(nodof,nnd,delta,nf)
 
-print node_disp
-
 nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 
+
+# Name of the output database
 POSTPRO.write_gmsh_file('Results1.msh',nnd,nodesFinal,node_disp,nel,Elements)
 
