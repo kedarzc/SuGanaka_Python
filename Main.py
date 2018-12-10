@@ -158,5 +158,6 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 
 
 # Name of the output database
-POSTPRO.write_gmsh_file('Results1.msh',nnd,nodesFinal,node_disp,nel,Elements)
+name_output_db = name_ip_file + '.msh'
+POSTPRO.write_gmsh_file(name_output_db,nnd,nodesFinal,node_disp,nel,Elements)
 
