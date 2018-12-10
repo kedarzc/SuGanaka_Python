@@ -154,8 +154,8 @@ def elem_Q4(elemNum,Nodes,Elements,nne,nodof,nf):
 	l = 0
 	for k in range(0,nne):
 		for j in range(0,nodof):
-			coordinates[k][j] = Nodes[(Elements[elemNum][k+1])-1,j+1]
-			g[0,l] = nf[(Elements[elemNum][k+1])-1,j]
+			coordinates[k][j] = Nodes[int(Elements[elemNum][k+1])-1,j+1]
+			g[0,l] = nf[int(Elements[elemNum][k+1])-1,j]
 			l = l + 1
 
 	return coordinates, g
@@ -229,8 +229,7 @@ def form_KK(KK,ke,g,eldof):
 		if g[0][i] != 0:
 			for j in range(0,eldof):
 				if g[0][j] != 0:
-					print g[0][i]-1,g[0][j-1]
-					KK[g[0][i]-1,g[0][j]-1] = KK[g[0][i]-1,g[0][j]-1] + ke[i][j]
+					KK[int(g[0][i]-1),int(g[0][j]-1)] = KK[int(g[0][i])-1,int(g[0][j]-1)] + ke[i][j]
 
 	return KK
 
