@@ -67,9 +67,6 @@ def readElements(all_lines,keyword_info,all_keywords_line_nos,all_asterix):
 
 	return Elements
 
-
-
-
 def parseKeywords(fileName):
 
 	lookup = '*'
@@ -79,30 +76,31 @@ def parseKeywords(fileName):
 	comment_lines = []
 
 
-	keyword_info = {}
+	keyword_info = []
 
 	with open(fileName) as myFile:
+
 		for num, line in enumerate(myFile, 1):
 
 			if lookup in line and line[1].isalpha() == True:
 
-				current_kewyword = line.split(',')[0]
+				current_keyword = line.split(',')[0].rstrip()
 
-				# Dictionary to store the keywords alongwith the 
+				# Save the keywords
+				all_keywords.append(current_keyword)
+
+				# List to store the keywords alongwith the 
 				# keyword line numbers
-				keyword_info[current_kewyword.rstrip()] = num
+				keyword_info.append(num)
 
 			if lookup in line and line[1] == '*':
 				comment_lines.append(num)
 
 	# Create array from the line numbers
-	all_keywords_line_nos = np.array(keyword_info.values())
-
-	# Create array from the keywords
-	all_keywords = keyword_info.keys()
+	all_keywords_line_nos = np.array(keyword_info)
 
 	# Create an a list that has all the lines which start with asterix
-	all_asterix = np.array(sorted(keyword_info.values() + comment_lines))
+	all_asterix = np.array(sorted(all_keywords + comment_lines))
 
 	return keyword_info, all_keywords, all_keywords_line_nos,comment_lines, all_asterix
 
@@ -244,3 +242,29 @@ def seprarate_disp(nodof,nnd,delta,nf):
 				node_disp[i][j] = delta[int(nf[i][j])-1]
 
 	return node_disp 
+
+# Create Node Sets
+# ----------------
+
+def createNodeSets(all_lines,keyword_info,all_keywords_line_nos,all_asterix):
+
+	nodal_keyword = keyword_info['*Nset']
+	next_line = all_asterix[all_asterix > nodal_keyword].min()
+
+	print keyword_info
+
+	# starting_line = nodal_keyword
+	# ending_line = next_line
+		
+	# Nodes = np.zeros(shape=(ending_line-starting_line-1,3))
+
+	# Nodal_counter = 0
+
+	# for i in range(starting_line+1,ending_line):
+	# 	Nodes[Nodal_counter,0] = float(all_lines[i-1].split(',')[0])
+	# 	Nodes[Nodal_counter,1] = float(all_lines[i-1].split(',')[1])
+	# 	Nodes[Nodal_counter,2] = float(all_lines[i-1].split(',')[2])
+		
+	# 	Nodal_counter = Nodal_counter + 1
+
+	# return Nodes
