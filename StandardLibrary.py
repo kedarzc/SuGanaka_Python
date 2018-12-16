@@ -29,7 +29,6 @@ def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 	# How many times does the keyword occur ?
 	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
 
-
 	nodal_keyword_line = keyword_lines[k_ids[0]]
 	next_line = all_asterix[all_asterix > nodal_keyword_line].min()
 
@@ -52,16 +51,17 @@ def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 
 
 # This function reads the nodal coordinates
-def readElements(all_lines,keyword_lines,all_keywords_line_nos,all_asterix):
+def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
 
-	# print keyword_lines
+	nativeKeyword = '*Element'
 
-	nodal_keyword = keyword_lines['*Element']
-	next_line = all_asterix[all_asterix > nodal_keyword].min()
+    # How many times does the keyword occur ?
+	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
 
-	# print next_line
+	element_keyword_line = keyword_lines[k_ids[0]]
+	next_line = all_asterix[all_asterix > element_keyword_line].min()
 
-	starting_line = nodal_keyword
+	starting_line = element_keyword_line
 	ending_line = next_line
 		
 	Elements = np.zeros(shape=(ending_line-starting_line-1,5))
