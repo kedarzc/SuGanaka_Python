@@ -15,9 +15,11 @@ all_lines = STDLIB.readFile(input_file)
 # Parse the input file for 'keywords'
 [keyword_info,all_keywords,all_keywords_line_nos,comment_lines,all_asterix] = STDLIB.parseKeywords(input_file)
 
+
 # Read the Nodes
 Nodes = STDLIB.readNodes(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
 
+'''
 # Read the elements
 Elements = STDLIB.readElements(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
 
@@ -52,6 +54,14 @@ num_gauss_points = 2;
 
 # Form the elastic matrix for plane stress
 dee = STDMTLLIB.formdsig(E,nu)
+
+# Create Node sets
+# ----------------
+
+# Create an empty dictionary
+NodeSets = {}
+STDLIB.createNodeSets(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
+
 
 # -------------------
 # Boundary conditions
@@ -160,4 +170,4 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
 POSTPRO.write_gmsh_file(name_output_db,nnd,nodesFinal,node_disp,nel,Elements)
-
+'''
