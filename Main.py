@@ -58,8 +58,8 @@ dee = STDMTLLIB.formdsig(E,nu)
 # ----------------
 
 # Create an empty dictionary
-NodeSets = {}
-# STDLIB.createNodeSets(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
+#NodeSets = {}
+NodeSets = STDLIB.createNodeSets(all_lines,all_keywords,keyword_lines,all_asterix)
 
 
 # -------------------
