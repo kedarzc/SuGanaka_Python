@@ -257,25 +257,41 @@ def seprarate_disp(nodof,nnd,delta,nf):
 # Create Node Sets
 # ----------------
 
-def createNodeSets(all_lines,keyword_lines,all_keywords_line_nos,all_asterix):
+def createNodeSets(all_lines,all_keywords,keyword_lines,all_asterix):
 
-	nodal_keyword = keyword_lines['*Nset']
-	next_line = all_asterix[all_asterix > nodal_keyword].min()
+	nativeKeyword = '*Nset'
 
-	print keyword_lines
+        # We will create a dictionary to save all  the node sets
+        nodeSets = {}
+        
+	# How many times does the keyword occur ?
+	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
 
-	# starting_line = nodal_keyword
-	# ending_line = next_line
-		
-	# Nodes = np.zeros(shape=(ending_line-starting_line-1,3))
+        # This loop continues for total number of node sets defined in the input file
+        for k in range(0,numOccurence):
+                
+                # There can be multiple node sets.
+                nodal_keyword_line = keyword_lines[k_ids[k]]
+                next_line = all_asterix[all_asterix > nodal_keyword_line].min()
+                
+                starting_line = nodal_keyword_line
+                ending_line = next_line
 
-	# Nodal_counter = 0
+                # Determine the name of the set
+                name_of_set =  all_lines[starting_line-1].split('=')[-1]
 
-	# for i in range(starting_line+1,ending_line):
-	# 	Nodes[Nodal_counter,0] = float(all_lines[i-1].split(',')[0])
-	# 	Nodes[Nodal_counter,1] = float(all_lines[i-1].split(',')[1])
-	# 	Nodes[Nodal_counter,2] = float(all_lines[i-1].split(',')[2])
-		
-	# 	Nodal_counter = Nodal_counter + 1
+                my_lines = []
+                nodeNums = []
 
-	# return Nodes
+                # Collect the lines that have the nodal numbers
+                for i in range(starting_line,ending_line-1):
+                         my_lines.append(all_lines[i].split(','))
+
+                # collect the nodal numbers from various lines into ONE list
+                for i in range(0,ending_line-1-starting_line):
+                        for j in range(0,len(my_lines[i])):
+                                nodeNums.append(int((my_lines[i][j]).rstrip()))
+                
+                nodeSets[name_of_set.rstrip()]= nodeNums
+        
+	return nodeSets
