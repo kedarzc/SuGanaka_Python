@@ -10,20 +10,32 @@ def readFile(fileName):
 
 	return all_lines
 
+def count_occurence_keyword(all_keywords,keyword_to_count):
+
+	# This function counts the occurence of a keyword in the keywords info
+	num_keyword_occurence_ids = [i for i, e in enumerate(all_keywords) if e == keyword_to_count]
+
+        # Count the number of occurences
+        num_keyword_occurence = len(num_keyword_occurence_ids)
+        
+	return num_keyword_occurence, num_keyword_occurence_ids
+
 
 # This function reads the nodal coordinates
-def readNodes(all_lines,keyword_info,all_keywords_line_nos,all_asterix):
+def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 
-	# print keyword_info
+	nativeKeyword = '*Node'
 
-	nodal_keyword = keyword_info['*Node']
-	next_line = all_asterix[all_asterix > nodal_keyword].min()
+	# How many times does the keyword occur ?
+	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
 
-	# print next_line
 
-	starting_line = nodal_keyword
+	nodal_keyword_line = keyword_lines[k_ids[0]]
+	next_line = all_asterix[all_asterix > nodal_keyword_line].min()
+
+	starting_line = nodal_keyword_line
 	ending_line = next_line
-		
+	        
 	Nodes = np.zeros(shape=(ending_line-starting_line-1,3))
 
 	Nodal_counter = 0
@@ -32,7 +44,7 @@ def readNodes(all_lines,keyword_info,all_keywords_line_nos,all_asterix):
 		Nodes[Nodal_counter,0] = float(all_lines[i-1].split(',')[0])
 		Nodes[Nodal_counter,1] = float(all_lines[i-1].split(',')[1])
 		Nodes[Nodal_counter,2] = float(all_lines[i-1].split(',')[2])
-		
+	        
 		Nodal_counter = Nodal_counter + 1
 
 	return Nodes
@@ -40,11 +52,11 @@ def readNodes(all_lines,keyword_info,all_keywords_line_nos,all_asterix):
 
 
 # This function reads the nodal coordinates
-def readElements(all_lines,keyword_info,all_keywords_line_nos,all_asterix):
+def readElements(all_lines,keyword_lines,all_keywords_line_nos,all_asterix):
 
-	# print keyword_info
+	# print keyword_lines
 
-	nodal_keyword = keyword_info['*Element']
+	nodal_keyword = keyword_lines['*Element']
 	next_line = all_asterix[all_asterix > nodal_keyword].min()
 
 	# print next_line
@@ -71,12 +83,14 @@ def parseKeywords(fileName):
 
 	lookup = '*'
 
+	# This list contains all the keywords in the file
 	all_keywords = []
-	all_keywords_line_nos = []
+	
+	# This list contains all the commented lines 
 	comment_lines = []
 
-
-	keyword_info = []
+	# This list contains the line numbers of the keywords
+	keyword_lines = []
 
 	with open(fileName) as myFile:
 
@@ -91,18 +105,15 @@ def parseKeywords(fileName):
 
 				# List to store the keywords alongwith the 
 				# keyword line numbers
-				keyword_info.append(num)
+				keyword_lines.append(num)
 
 			if lookup in line and line[1] == '*':
 				comment_lines.append(num)
+        
+	# Create a list that has all the lines which start with asterix
+	all_asterix = np.array(sorted(keyword_lines + comment_lines))
 
-	# Create array from the line numbers
-	all_keywords_line_nos = np.array(keyword_info)
-
-	# Create an a list that has all the lines which start with asterix
-	all_asterix = np.array(sorted(all_keywords + comment_lines))
-
-	return keyword_info, all_keywords, all_keywords_line_nos,comment_lines, all_asterix
+	return keyword_lines, all_keywords,comment_lines, all_asterix
 
 
 def gaussPoints(ng):
@@ -246,12 +257,12 @@ def seprarate_disp(nodof,nnd,delta,nf):
 # Create Node Sets
 # ----------------
 
-def createNodeSets(all_lines,keyword_info,all_keywords_line_nos,all_asterix):
+def createNodeSets(all_lines,keyword_lines,all_keywords_line_nos,all_asterix):
 
-	nodal_keyword = keyword_info['*Nset']
+	nodal_keyword = keyword_lines['*Nset']
 	next_line = all_asterix[all_asterix > nodal_keyword].min()
 
-	print keyword_info
+	print keyword_lines
 
 	# starting_line = nodal_keyword
 	# ending_line = next_line
