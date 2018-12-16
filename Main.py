@@ -13,15 +13,14 @@ name_ip_file = input_file[:-5]
 all_lines = STDLIB.readFile(input_file)
 
 # Parse the input file for 'keywords'
-[keyword_info,all_keywords,all_keywords_line_nos,comment_lines,all_asterix] = STDLIB.parseKeywords(input_file)
-
+[keyword_lines, all_keywords,comment_lines, all_asterix] = STDLIB.parseKeywords(input_file)
 
 # Read the Nodes
-Nodes = STDLIB.readNodes(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
+Nodes = STDLIB.readNodes(all_lines,all_keywords,keyword_lines,all_asterix)
 
-'''
+
 # Read the elements
-Elements = STDLIB.readElements(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
+Elements = STDLIB.readElements(all_lines,all_keywords,keyword_lines,all_asterix)
 
 # Count the number of nodes
 nnd = len(Nodes)
@@ -60,7 +59,7 @@ dee = STDMTLLIB.formdsig(E,nu)
 
 # Create an empty dictionary
 NodeSets = {}
-STDLIB.createNodeSets(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
+# STDLIB.createNodeSets(all_lines,keyword_info,all_keywords_line_nos,all_asterix)
 
 
 # -------------------
@@ -170,4 +169,4 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
 POSTPRO.write_gmsh_file(name_output_db,nnd,nodesFinal,node_disp,nel,Elements)
-'''
+
