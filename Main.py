@@ -56,9 +56,6 @@ dee = STDMTLLIB.formdsig(E,nu)
 
 # Create Node sets
 # ----------------
-
-# Create an empty dictionary
-#NodeSets = {}
 NodeSets = STDLIB.createNodeSets(all_lines,all_keywords,keyword_lines,all_asterix)
 
 
@@ -66,16 +63,11 @@ NodeSets = STDLIB.createNodeSets(all_lines,all_keywords,keyword_lines,all_asteri
 # Boundary conditions
 # -------------------
 
-# Initialise the nodal freedom matrix to 1
-nf = np.ones(shape=(nnd,nodof));
+# Read the boundary conditions
+BCS_NodeSet = STDLIB.read_BCS(all_lines,all_keywords,keyword_lines,all_asterix)
 
-nf[12,0] = 0; nf[12,1] = 0;
-nf[25,0] = 0; nf[25,1] = 0;
-nf[38,0] = 0; nf[38,1] = 0;
-nf[51,0] = 0; nf[51,1] = 0;
-nf[64,0] = 0; nf[64,1] = 0;
-nf[77,0] = 0; nf[77,1] = 0;
-nf[90,0] = 0; nf[90,1] = 0;
+# Apply the Boundary Conditions
+nf = STDLIB.apply_BCS(nnd,nodof,NodeSets,BCS_NodeSet)
 
 # Count the free degrees of freedom (Size of the stiffness matrix)
 active_dof = 0
