@@ -295,3 +295,71 @@ def createNodeSets(all_lines,all_keywords,keyword_lines,all_asterix):
                 nodeSets[name_of_set.rstrip()]= nodeNums
         
 	return nodeSets
+
+# This funciton reads the boundary conditions from the input files
+def read_BCS(all_lines,all_keywords,keyword_lines,all_asterix):
+        
+	nativeKeyword = '*Boundary'
+
+	# We will create a dictionary to save all  the node sets
+	nodeSets_BCS = {}
+
+	# How many times does the keyword occur ?
+	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
+
+	nodal_keyword_line = keyword_lines[k_ids[0]]
+	next_line = all_asterix[all_asterix > nodal_keyword_line].min()
+
+	starting_line = nodal_keyword_line
+	ending_line = next_line
+
+	# Empty dictionary to save the node sets on which the BCS have been applied
+	BCS_NodeSet = {}
+
+	# This set saves the name of the sets on which the boundary condition has been applied
+	BC_NodeSet_list = []
+
+	# This set saves the constrained degrees of freedom
+	constrained_DOF_string = []
+
+	for i in range(starting_line,ending_line-1):
+			BC_NodeSet_list.append((all_lines[i].split(',')[0]).rstrip())
+			constrained_DOF_string.append(all_lines[i].split(',')[1::])
+
+
+	for i in range(0,len(constrained_DOF_string)):
+			
+		temp_nodal_nums = []
+
+		for j in range(0,len(constrained_DOF_string[i])):
+				 temp_nodal_nums.append(int((constrained_DOF_string[i][j]).rstrip()))
+
+		BCS_NodeSet[BC_NodeSet_list[i]] = temp_nodal_nums        
+
+	return BCS_NodeSet
+
+
+# Apply boundary conditions to the node sets
+def apply_BCS(nnd,nodof,NodeSets,BCS_NodeSet):
+
+        # Initialise the nodal freedom matrix to 1
+        nf = np.ones(shape=(nnd,nodof))
+
+        # Determine the total number of BCS
+        total_BCS = len(BCS_NodeSet.keys())
+        BCS_keys = BCS_NodeSet.keys()
+
+        for i in range(0,total_BCS):
+                
+                for j in range(0,len(NodeSets[BCS_keys[i]])):
+
+                        # The node number on which the BCS is being applied
+                        Node_num = NodeSets[BCS_keys[i]][j]
+
+                        for k in range(0,len(BCS_NodeSet[BCS_keys[i]])):
+                                prescribed_dof = BCS_NodeSet[BCS_keys[i]][k]
+                                nf[Node_num-1,prescribed_dof-1] = 0
+
+        return nf
+         
+        
