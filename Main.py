@@ -81,6 +81,10 @@ for i in range(0,nnd):
 # -------
 # Loading
 # -------
+
+CLOAD_NodeSet = STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
+
+'''
 Nodal_loads = np.zeros(shape=(nnd,nodof))
 Nodal_loads[39][0]=0.0 
 Nodal_loads[39][1]=-1.5e+06
@@ -161,4 +165,4 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
 POSTPRO.write_gmsh_file(name_output_db,nnd,nodesFinal,node_disp,nel,Elements)
-
+'''
