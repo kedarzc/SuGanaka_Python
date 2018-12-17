@@ -390,21 +390,43 @@ def read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix):
 	Cload_NodeSet_list = []
 
 	# This set saves the constrained degrees of freedom
-	Cload_DOF_string = []
+	Cload_DOF_MAG_string = []
 
 	for i in range(starting_line,ending_line-1):
-			Cload_NodeSet_list.append((all_lines[i].split(',')[0]).rstrip())
-			Cload_DOF_string.append(all_lines[i].split(',')[1::])
-	    
-	for i in range(0,len(Cload_DOF_string)):
-	        
-	    temp_nodal_nums = []
+		Cload_NodeSet_list.append((all_lines[i].split(',')[0]).rstrip())
+		Cload_DOF_MAG_string.append(all_lines[i].split(',')[1::])
 
-	    for j in range(0,len(Cload_DOF_string[i])):
-	                     temp_nodal_nums.append(int((Cload_DOF_string[i][j]).rstrip()))
+	nodal_nums = []
 
-	    Cload_NodeSet[Cload_NodeSet_list[i]] = temp_nodal_nums
+	for i in range(0,len(Cload_NodeSet_list)):
 
-	return Cload_NodeSet
+		temp_nodal_nums = []
 
-        
+		for j in range(0,len(Cload_DOF_MAG_string[i])):
+			temp_nodal_nums.append(float((Cload_DOF_MAG_string[i][j]).rstrip()))
+
+		nodal_nums.append(temp_nodal_nums)
+
+	return Cload_NodeSet_list, nodal_nums
+
+
+# This function applied the nodal loads
+def apply_cloads(nnd,nodof,NodeSets,Cload_NodeSet_list,Cload_dof_mag):
+
+	Nodal_loads = np.zeros(shape=(nnd,nodof))
+
+	# i = node list. Do this loop for all the node lists
+	for i in range(0,len(Cload_NodeSet_list)):
+
+	    # node number, do this for all the nodes in the list
+	    for j in range(0,len(NodeSets[Cload_NodeSet_list[i]])):
+
+	        # First index tells us the node number in the global nodal_loads array
+	        index_I = int(NodeSets[Cload_NodeSet_list[i]][j]-1)
+
+	        # Second index tells us the dof of the node in the global nodal_loads array
+	        index_II = int(Cload_dof_mag[i][0]-1)
+
+	        Nodal_loads[index_I,index_II] = Cload_dof_mag[i][1]
+
+	return Nodal_loads      
