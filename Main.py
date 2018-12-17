@@ -5,8 +5,18 @@ import csv
 import numpy as np
 from numpy.linalg import inv
 
+# INPUTS 
+# -----------------------------------------------------------------------------------------
 # The name of the input file
 input_file = 'Beam_bending.sinp'
+
+# Post processign info
+deform_factor = 10
+
+# -----------------------------------------------------------------------------------------
+# INPUTS END
+
+
 name_ip_file = input_file[:-5]
 
 # Read entire input file
@@ -82,15 +92,12 @@ for i in range(0,nnd):
 # Loading
 # -------
 
-CLOAD_NodeSet = STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
+# Read the node sets where the concentrated load sets are applied
+[Cload_NodeSet_list, Cload_dof_mag]= STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
 
-'''
-Nodal_loads = np.zeros(shape=(nnd,nodof))
-Nodal_loads[39][0]=0.0 
-Nodal_loads[39][1]=-1.5e+06
+# Apply the actual loading
+Nodal_loads = STDLIB.apply_cloads(nnd,nodof,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
 
-# Post processign info
-deform_factor = 50
 # ------------------------------------------------------------------------------
 # Assemble the global force vector
 # This force vector will have one column and active_dof-rows
@@ -165,4 +172,3 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
 POSTPRO.write_gmsh_file(name_output_db,nnd,nodesFinal,node_disp,nel,Elements)
-'''
