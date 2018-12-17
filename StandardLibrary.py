@@ -363,3 +363,48 @@ def apply_BCS(nnd,nodof,NodeSets,BCS_NodeSet):
         return nf
          
         
+# Read the loading information
+def read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix):
+
+	# This function reads the loads.
+	# The type of load is concentrated load on nodes
+
+	nativeKeyword = '*Cload'
+
+	# We will create a dictionary to save all  the node sets
+	nodeSets_Cload = {}
+
+	# How many times does the keyword occur ?
+	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
+
+	nodal_keyword_line = keyword_lines[k_ids[0]]
+	next_line = all_asterix[all_asterix > nodal_keyword_line].min()
+
+	starting_line = nodal_keyword_line
+	ending_line = next_line
+
+	# Empty dictionary to save the node sets on which the loads have been applied
+	Cload_NodeSet = {}
+
+	# This set saves the name of the sets on which the boundary condition has been applied
+	Cload_NodeSet_list = []
+
+	# This set saves the constrained degrees of freedom
+	Cload_DOF_string = []
+
+	for i in range(starting_line,ending_line-1):
+			Cload_NodeSet_list.append((all_lines[i].split(',')[0]).rstrip())
+			Cload_DOF_string.append(all_lines[i].split(',')[1::])
+	    
+	for i in range(0,len(Cload_DOF_string)):
+	        
+	    temp_nodal_nums = []
+
+	    for j in range(0,len(Cload_DOF_string[i])):
+	                     temp_nodal_nums.append(int((Cload_DOF_string[i][j]).rstrip()))
+
+	    Cload_NodeSet[Cload_NodeSet_list[i]] = temp_nodal_nums
+
+	return Cload_NodeSet
+
+        
