@@ -8,10 +8,10 @@ from numpy.linalg import inv
 # INPUTS 
 # -----------------------------------------------------------------------------------------
 # The name of the input file
-input_file = 'Beam_bending.sinp'
+input_file = 'Beam_bending_ABQ.sinp'
 
 # Post processign info
-deform_factor = 10
+deform_factor = 1
 
 # -----------------------------------------------------------------------------------------
 # INPUTS END
@@ -49,14 +49,14 @@ eldof = nne*nodof
 # Material
 # --------
 
-# Elastic Modulus in MPa
-E = 2.8e+07;
+# Elastic Modulus in Pa
+E =  1e+08
 
 # Poisson's ratio
-nu = 0.3;
+nu = 0.3
 
-# Beam thickness in mm
-thick = 5.0;
+# Beam thickness in m
+thick = 0.1
 
 # Number of sampling points
 num_gauss_points = 2;
@@ -77,7 +77,7 @@ NodeSets = STDLIB.createNodeSets(all_lines,all_keywords,keyword_lines,all_asteri
 BCS_NodeSet = STDLIB.read_BCS(all_lines,all_keywords,keyword_lines,all_asterix)
 
 # Apply the Boundary Conditions
-nf = STDLIB.apply_BCS(nnd,nodof,NodeSets,BCS_NodeSet)
+nf = STDLIB.apply_BCS(nnd,nodof,Nodes,NodeSets,BCS_NodeSet)
 
 # Count the free degrees of freedom (Size of the stiffness matrix)
 active_dof = 0
@@ -96,7 +96,8 @@ for i in range(0,nnd):
 [Cload_NodeSet_list, Cload_dof_mag]= STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
 
 # Apply the actual loading
-Nodal_loads = STDLIB.apply_cloads(nnd,nodof,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
+Nodal_loads = STDLIB.apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
+
 
 # ------------------------------------------------------------------------------
 # Assemble the global force vector
@@ -124,7 +125,6 @@ KK = np.zeros(shape=(active_dof,active_dof))
 
 # Form the element stiffness matrix and then assemble the global stiffness matrix
 for i in range(0,nel):
-
 	# Extract the coordinates of the element and the steering vector
 	[coords,g] = STDLIB.elem_Q4(i,Nodes,Elements,nne,nodof,nf)
 
@@ -171,4 +171,5 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
-POSTPRO.write_gmsh_file(name_output_db,nnd,nodesFinal,node_disp,nel,Elements)
+POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements)
+
