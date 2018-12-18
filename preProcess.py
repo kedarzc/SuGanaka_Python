@@ -18,10 +18,10 @@ def write_mesh(nameFile,nnd,nel,Nodes,Elements):
 
 	for i in range(0,nnd):
 
-		NodeNum = i+1
-		XCoord = Nodes[i][1]
-		YCoord = Nodes[i][2]
-		ZCoord = 0.0
+		NodeNum = int(Nodes[i][0])
+		XCoord  = Nodes[i][1]
+		YCoord  = Nodes[i][2]
+		ZCoord  = 0.0
 
 		gmshfile.write(str(NodeNum) +' ' +str(XCoord) +' '+ str(YCoord) +' '+ str(ZCoord))
 		gmshfile.write('\n')
