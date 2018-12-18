@@ -1,5 +1,5 @@
 
-def write_gmsh_file(nameFile,nnd,nodesFinal,node_disp,nel,Elements):
+def write_gmsh_file(nameFile,nnd,Nodes,nodesFinal,node_disp,nel,Elements):
 
 	# Create the gmsh file
 	gmshfile=open(nameFile,'w')
@@ -15,7 +15,7 @@ def write_gmsh_file(nameFile,nnd,nodesFinal,node_disp,nel,Elements):
 
 	for i in range(0,nnd):
 
-		NodeNum = i+1
+		NodeNum = int(Nodes[i][0])
 		XCoord = nodesFinal[i][0]
 		YCoord = nodesFinal[i][1]
 		ZCoord = 0.0
