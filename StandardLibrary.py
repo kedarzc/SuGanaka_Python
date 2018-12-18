@@ -156,6 +156,8 @@ def gaussPoints(ng):
 # the steering vector for the element
 def elem_Q4(elemNum,Nodes,Elements,nne,nodof,nf):
 
+        all_node_nos = Nodes[:,0]
+        
 	coordinates = np.zeros(shape=(nne,nodof))
 	g = np.zeros(shape=(1,nne*nodof))
 
@@ -163,8 +165,12 @@ def elem_Q4(elemNum,Nodes,Elements,nne,nodof,nf):
 	l = 0
 	for k in range(0,nne):
 		for j in range(0,nodof):
-			coordinates[k][j] = Nodes[int(Elements[elemNum][k+1])-1,j+1]
-			g[0,l] = nf[int(Elements[elemNum][k+1])-1,j]
+
+                        # Node number
+                        Node_num_index = np.where(all_node_nos==int(Elements[elemNum][k+1]))
+                        
+			coordinates[k][j] = Nodes[Node_num_index,j+1]
+			g[0,l] = nf[Node_num_index,j]
 			l = l + 1
 
 	return coordinates, g
@@ -340,8 +346,10 @@ def read_BCS(all_lines,all_keywords,keyword_lines,all_asterix):
 
 
 # Apply boundary conditions to the node sets
-def apply_BCS(nnd,nodof,NodeSets,BCS_NodeSet):
+def apply_BCS(nnd,nodof,Nodes,NodeSets,BCS_NodeSet):
 
+        all_node_nos = Nodes[:,0]
+        
         # Initialise the nodal freedom matrix to 1
         nf = np.ones(shape=(nnd,nodof))
 
@@ -356,9 +364,12 @@ def apply_BCS(nnd,nodof,NodeSets,BCS_NodeSet):
                         # The node number on which the BCS is being applied
                         Node_num = NodeSets[BCS_keys[i]][j]
 
+                        # find the index of the node number
+                        Node_num_index = np.where(all_node_nos==Node_num)
+                        
                         for k in range(0,len(BCS_NodeSet[BCS_keys[i]])):
                                 prescribed_dof = BCS_NodeSet[BCS_keys[i]][k]
-                                nf[Node_num-1,prescribed_dof-1] = 0
+                                nf[Node_num_index,prescribed_dof-1] = 0
 
         return nf
          
@@ -411,8 +422,11 @@ def read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix):
 
 
 # This function applied the nodal loads
-def apply_cloads(nnd,nodof,NodeSets,Cload_NodeSet_list,Cload_dof_mag):
+def apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag):
 
+        # Find the node numbers
+        all_node_nos = Nodes[:,0]
+        
 	Nodal_loads = np.zeros(shape=(nnd,nodof))
 
 	# i = node list. Do this loop for all the node lists
@@ -422,7 +436,10 @@ def apply_cloads(nnd,nodof,NodeSets,Cload_NodeSet_list,Cload_dof_mag):
 	    for j in range(0,len(NodeSets[Cload_NodeSet_list[i]])):
 
 	        # First index tells us the node number in the global nodal_loads array
-	        index_I = int(NodeSets[Cload_NodeSet_list[i]][j]-1)
+                # --------------------------------------------------------------------
+                # find the index of the node number
+                Node_num_index_I = np.where(all_node_nos==NodeSets[Cload_NodeSet_list[i]][j])
+	        index_I = Node_num_index_I
 
 	        # Second index tells us the dof of the node in the global nodal_loads array
 	        index_II = int(Cload_dof_mag[i][0]-1)
