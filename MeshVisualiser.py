@@ -5,7 +5,7 @@ import preProcess as PREPRO
 # INPUTS 
 # -----------------------------------------------------------------------------------------
 # The name of the input file
-input_file = 'Beam_bending_ABQ.sinp'
+input_file = 'Beam_bending.sinp'
 
 
 # -----------------------------------------------------------------------------------------

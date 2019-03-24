@@ -167,8 +167,10 @@
 72, 77, 78, 91, 90
 **
 **Define sets
-*Nset, nset=Loadnode
+*Nset, nset=Loadnode1
 40
+*Nset, nset=Loadnode2
+46
 *Nset, nset=BCX
 13, 26, 39, 52, 65, 78, 91
 *Nset, nset=BCY
@@ -176,7 +178,7 @@
 **
 *Materials, name=Steel
 *Elastic
-2.8e+07, 0.3
+2.0e+11, 0.3
 **
 ** BOUNDARY CONDITIONS
 **
@@ -187,8 +189,10 @@ BCY, 2
 ** LOADS
 ** 
 *Cload
-Loadnode, 1, 0.
-Loadnode, 2, -1.5e+06
+Loadnode2, 1, 0.
+Loadnode2, 2, 15000
+Loadnode1, 1, 0.
+Loadnode1, 2, -15000
 **
 ** OUTPUT REQUESTS
 **

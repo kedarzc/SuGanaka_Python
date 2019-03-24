@@ -446,4 +446,33 @@ def apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag):
 
 	        Nodal_loads[index_I,index_II] = Cload_dof_mag[i][1]
 
-	return Nodal_loads      
+	return Nodal_loads    
+
+# This function read the material properties from the input file
+def read_elastic_material(all_lines,all_keywords,keyword_lines,all_asterix):
+
+	nativeKeyword = '*Elastic'
+
+	# How many times does the keyword occur ?
+	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
+
+	nodal_keyword_line = keyword_lines[k_ids[0]]
+	next_line = all_asterix[all_asterix > nodal_keyword_line].min()
+
+	starting_line = nodal_keyword_line
+	ending_line = next_line
+
+	# Now that we know the starting and ending lines, we will actually read 
+	# the elastic modulus and the poisson's ratio
+	# We know that the first line will contain the keyword *Elastic and thus 
+	# the second line will contain the information we need in the format 
+	# E,nu
+
+	for i in range(starting_line,ending_line-1):
+		E =  float((all_lines[i].split(',')[0]).rstrip())
+		nu =  float((all_lines[i].split(',')[1]).rstrip())
+
+	return E,nu
+
+
+

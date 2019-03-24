@@ -8,10 +8,10 @@ from numpy.linalg import inv
 # INPUTS 
 # -----------------------------------------------------------------------------------------
 # The name of the input file
-input_file = 'Beam_bending_ABQ.sinp'
+input_file = 'Beam_bending.sinp'
 
 # Post processign info
-deform_factor = 1
+deform_factor = 100000
 
 # -----------------------------------------------------------------------------------------
 # INPUTS END
@@ -28,9 +28,12 @@ all_lines = STDLIB.readFile(input_file)
 # Read the Nodes
 Nodes = STDLIB.readNodes(all_lines,all_keywords,keyword_lines,all_asterix)
 
-
 # Read the elements
 Elements = STDLIB.readElements(all_lines,all_keywords,keyword_lines,all_asterix)
+
+# Read the linear elastic material
+[E,nu] = STDLIB.read_elastic_material(all_lines,all_keywords,keyword_lines,all_asterix)
+
 
 # Count the number of nodes
 nnd = len(Nodes)
@@ -50,13 +53,13 @@ eldof = nne*nodof
 # --------
 
 # Elastic Modulus in Pa
-E =  1e+08
+# E =  2e+011
 
 # Poisson's ratio
-nu = 0.3
+# nu = 0.3
 
 # Beam thickness in m
-thick = 0.1
+thick = 0.01
 
 # Number of sampling points
 num_gauss_points = 2;
@@ -172,4 +175,3 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
 POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements)
-
