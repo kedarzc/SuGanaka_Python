@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import math
+import re
 
 def readFile(fileName):
 
@@ -52,9 +53,14 @@ def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 
 # This function reads the nodal coordinates
 def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
-
+	
+	# Element Library
+	# ----------------
+	# This dictionary stores the size of the array for the elements
+	ElemsAvailable = {'TD2':2,'CPS4':4}
+	
 	nativeKeyword = '*Element'
-
+	
     # How many times does the keyword occur ?
 	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
 
@@ -63,22 +69,46 @@ def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
 
 	starting_line = element_keyword_line
 	ending_line = next_line
-		
-	Elements = np.zeros(shape=(ending_line-starting_line-1,5))
 
+	# Figure out the element type
+	# ---------------------------
+	
+	# Read line where *Element keyword occurs
+	elem_type_line = all_lines[starting_line-1].split(',')[1]
+	
+	# Now subtract the 'type=' string from that line
+	elemType = elem_type_line.replace("type=","")
+	
+	# Now remove all white \t spaces, new lines \n and tabs \t 
+	elemType = re.sub(r"\W", "", elemType)
+		
+	Elements = np.zeros(shape=(ending_line-starting_line-1,ElemsAvailable[elemType]+1))
+		
 	Element_counter = 0
+	
+	if elemType == 'TD2':
+	
+		for i in range(starting_line+1,ending_line):
+			Elements[Element_counter,0] = float(all_lines[i-1].split(',')[0])
+			Elements[Element_counter,1] = float(all_lines[i-1].split(',')[1])
+			Elements[Element_counter,2] = float(all_lines[i-1].split(',')[2])
+			
+			Element_counter = Element_counter + 1
+			
+	elif elemType == 'CPS4':
+	
+		for i in range(starting_line+1,ending_line):
+			Elements[Element_counter,0] = float(all_lines[i-1].split(',')[0])
+			Elements[Element_counter,1] = float(all_lines[i-1].split(',')[1])
+			Elements[Element_counter,2] = float(all_lines[i-1].split(',')[2])
+			Elements[Element_counter,3] = float(all_lines[i-1].split(',')[3])
+			Elements[Element_counter,4] = float(all_lines[i-1].split(',')[4])
+			
+			Element_counter = Element_counter + 1
 
-	for i in range(starting_line+1,ending_line):
-		Elements[Element_counter,0] = float(all_lines[i-1].split(',')[0])
-		Elements[Element_counter,1] = float(all_lines[i-1].split(',')[1])
-		Elements[Element_counter,2] = float(all_lines[i-1].split(',')[2])
-		Elements[Element_counter,3] = float(all_lines[i-1].split(',')[3])
-		Elements[Element_counter,4] = float(all_lines[i-1].split(',')[4])
-		
-		Element_counter = Element_counter + 1
-
-	return Elements
-
+	# Return the elements and the type of the elements
+	return Elements, elemType
+	
 def parseKeywords(fileName):
 
 	lookup = '*'

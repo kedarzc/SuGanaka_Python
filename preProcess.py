@@ -1,6 +1,8 @@
 
-def write_mesh(nameFile,nnd,nel,Nodes,Elements):
-
+def write_mesh(nameFile,nnd,nel,Nodes,Elements,elemType):
+	
+	elemLib_GMSH = {'TD2':1,'CPS4':3}
+	
 	# Write the mesh file
 	# -------------------
 
@@ -31,17 +33,27 @@ def write_mesh(nameFile,nnd,nel,Nodes,Elements):
 	# Gmsh Element information
 	gmshfile.write('$Elements\n')
 	gmshfile.write(str(nel) + str('\n'))
-
+	
 	for i in range(0,nel):
+		
+		if elemType == 'TD2':
+			ElemNum = int(Elements[i][0])
+			N1 = int(Elements[i][1])
+			N2 = int(Elements[i][2])
 
-		ElemNum = int(Elements[i][0])
-		N1 = int(Elements[i][1])
-		N2 = int(Elements[i][2])
-		N3 = int(Elements[i][3])
-		N4 = int(Elements[i][4])
+			gmshfile.write(str(ElemNum) +' '+ str(elemLib_GMSH[elemType])+' 2 99 2' +' '+ str(N1) +' '+ str(N2))
+			
+			gmshfile.write('\n')
+			
+		elif elemType == 'CPS4':		
+			ElemNum = int(Elements[i][0])
+			N1 = int(Elements[i][1])
+			N2 = int(Elements[i][2])
+			N3 = int(Elements[i][3])
+			N4 = int(Elements[i][4])
 
-		gmshfile.write(str(ElemNum) +' '+ '3 2 99 2' +' '+ str(N1) +' '+ str(N2) +' '+ str(N3) +' '+ str(N4))
-		gmshfile.write('\n')
+			gmshfile.write(str(ElemNum) +' '+ str(elemLib_GMSH[elemType])+' 2 99 2' +' '+ str(N1) +' '+ str(N2) +' '+ str(N3) +' '+ str(N4))
+			gmshfile.write('\n')
 
 	gmshfile.write('$End'+'Elements\n')
 

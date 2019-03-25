@@ -23,10 +23,10 @@ all_lines = STDLIB.readFile(input_file)
 Nodes = STDLIB.readNodes(all_lines,all_keywords,keyword_lines,all_asterix)
 
 # Read the elements
-Elements = STDLIB.readElements(all_lines,all_keywords,keyword_lines,all_asterix)
+[Elements,elemType] = STDLIB.readElements(all_lines,all_keywords,keyword_lines,all_asterix)
 
 # Count the number of nodes
 nnd = len(Nodes)
 nel = len(Elements)
 
-PREPRO.write_mesh(name_ip_file,nnd,nel,Nodes,Elements)
+PREPRO.write_mesh(name_ip_file,nnd,nel,Nodes,Elements,elemType)
