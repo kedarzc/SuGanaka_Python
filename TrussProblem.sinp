@@ -21,3 +21,7 @@
 *Nset, nset=BCY
 103
 **
+*Materials, name=Steel
+*Elastic
+2.0e+11, 0.3
+**
