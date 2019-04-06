@@ -49,7 +49,7 @@ def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 
 	return Nodes
 
-def elementsLibrary(nameElement,nne):
+def elementsLibrary(nameElement):
 
 	AllElemsAvailable = {'TD2':2,'CPS4':4}
 
@@ -86,7 +86,7 @@ def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
 	# Now remove all white \t spaces, new lines \n and tabs \t 
 	elemType = re.sub(r"\W", "", elemType)
 		
-	Elements = np.zeros(shape=(ending_line-starting_line-1,elementsLibrary[elemType]+1))
+	Elements = np.zeros(shape=(ending_line-starting_line-1,elementsLibrary(elemType)+1))
 		
 	Element_counter = 0
 	
