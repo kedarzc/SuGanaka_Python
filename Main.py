@@ -39,9 +39,6 @@ Elements = STDLIB.readElements(all_lines,all_keywords,keyword_lines,all_asterix)
 nnd = len(Nodes)
 nel = len(Elements[0])
 
-print nnd
-print nel
-
 '''
 # Number of nodes per element
 nne = 4
