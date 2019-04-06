@@ -8,7 +8,7 @@ from numpy.linalg import inv
 # INPUTS 
 # -----------------------------------------------------------------------------------------
 # The name of the input file
-input_file = 'Beam_bending.sinp'
+input_file = 'TrussProblem.sinp'
 
 # Post processign info
 deform_factor = 100000
@@ -37,8 +37,12 @@ Elements = STDLIB.readElements(all_lines,all_keywords,keyword_lines,all_asterix)
 
 # Count the number of nodes
 nnd = len(Nodes)
-nel = len(Elements)
+nel = len(Elements[0])
 
+print nnd
+print nel
+
+'''
 # Number of nodes per element
 nne = 4
 
@@ -175,3 +179,4 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
 POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements)
+'''
