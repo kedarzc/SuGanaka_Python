@@ -39,12 +39,15 @@ Elements = STDLIB.readElements(all_lines,all_keywords,keyword_lines,all_asterix)
 nnd = len(Nodes)
 nel = len(Elements[0])
 
-'''
+# Identify the element
+name_of_Element = Elements[1]
+currentElement = STDLIB.elementsLibrary(name_of_Element)
+
 # Number of nodes per element
-nne = 4
+nne = currentElement.nne
 
 # Number of degrees of freedom per node
-nodof = 2
+nodof = currentElement.nodof
 
 # Number of degrees of freedom per element
 eldof = nne*nodof
@@ -59,6 +62,7 @@ eldof = nne*nodof
 # Poisson's ratio
 # nu = 0.3
 
+'''
 # Beam thickness in m
 thick = 0.01
 
