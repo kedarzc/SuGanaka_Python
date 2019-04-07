@@ -52,16 +52,6 @@ nodof = currentElement.nodof
 # Number of degrees of freedom per element
 eldof = nne*nodof
 
-# --------
-# Material
-# --------
-
-# Elastic Modulus in Pa
-# E =  2e+011
-
-# Poisson's ratio
-# nu = 0.3
-
 '''
 # Beam thickness in m
 thick = 0.01
