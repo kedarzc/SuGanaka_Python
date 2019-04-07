@@ -51,9 +51,27 @@ def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 
 def elementsLibrary(nameElement):
 
-	AllElemsAvailable = {'TD2':2,'CPS4':4}
+	class ElementClass:
 
-	return AllElemsAvailable[nameElement]
+		def __init__(self, name_of_Element):
+
+			self.name_of_Element = name_of_Element
+
+			# Element TD2
+			if name_of_Element == 'TD2':
+				self.nne   = 2
+				self.nodof = 2
+
+			elif name_of_Element == 'CPS4':
+				self.nne   = 4
+				self.nodof = 2
+
+	Element_current = ElementClass(nameElement)
+
+	return Element_current
+		
+
+	return AllElemsAvailable_nne[nameElement]
 
 
 # This function reads the nodal coordinates
@@ -64,7 +82,7 @@ def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
 	# This dictionary stores the size of the array for the elements
 	
 	nativeKeyword = '*Element'
-	
+
     # How many times does the keyword occur ?
 	[numOccurence,k_ids] = count_occurence_keyword(all_keywords,nativeKeyword)
 
@@ -85,8 +103,11 @@ def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
 	
 	# Now remove all white \t spaces, new lines \n and tabs \t 
 	elemType = re.sub(r"\W", "", elemType)
+
+	# Extract the element information
+	currentElement = elementsLibrary(elemType)
 		
-	Elements = np.zeros(shape=(ending_line-starting_line-1,elementsLibrary(elemType)+1))
+	Elements = np.zeros(shape=(ending_line-starting_line-1,currentElement.nodof+1))
 		
 	Element_counter = 0
 	
