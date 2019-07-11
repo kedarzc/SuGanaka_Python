@@ -65,6 +65,10 @@ def elementsLibrary(nameElement):
 			elif name_of_Element == 'CPS4':
 				self.nne   = 4
 				self.nodof = 2
+				
+			elif name_of_Element == 'C3D8':
+				self.nne   = 8
+				self.nodof = 3
 
 	Element_current = ElementClass(nameElement)
 
@@ -130,7 +134,22 @@ def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
 			Elements[Element_counter,4] = float(all_lines[i-1].split(',')[4])
 			
 			Element_counter = Element_counter + 1
-
+		
+	elif elemType == 'C3D8':
+	
+		for i in range(starting_line+1,ending_line):
+			Elements[Element_counter,0] = float(all_lines[i-1].split(',')[0])
+			Elements[Element_counter,1] = float(all_lines[i-1].split(',')[1])
+			Elements[Element_counter,2] = float(all_lines[i-1].split(',')[2])
+			Elements[Element_counter,3] = float(all_lines[i-1].split(',')[3])
+			Elements[Element_counter,4] = float(all_lines[i-1].split(',')[4])
+			Elements[Element_counter,5] = float(all_lines[i-1].split(',')[5])
+			Elements[Element_counter,6] = float(all_lines[i-1].split(',')[6])
+			Elements[Element_counter,7] = float(all_lines[i-1].split(',')[7])
+			Elements[Element_counter,8] = float(all_lines[i-1].split(',')[8])
+			
+			Element_counter = Element_counter + 1
+			
 	# Return the elements and the type of the elements
 	return Elements, elemType
 	

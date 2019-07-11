@@ -8,7 +8,7 @@ from numpy.linalg import inv
 # INPUTS 
 # -----------------------------------------------------------------------------------------
 # The name of the input file
-input_file = 'Beam_bending.sinp'
+input_file = 'BrickElement.sinp'
 
 # Post processign info
 deform_factor = 100000
@@ -77,99 +77,99 @@ BCS_NodeSet = STDLIB.read_BCS(all_lines,all_keywords,keyword_lines,all_asterix)
 # Apply the Boundary Conditions
 nf = STDLIB.apply_BCS(nnd,nodof,Nodes,NodeSets,BCS_NodeSet)
 
-# Count the free degrees of freedom (Size of the stiffness matrix)
-active_dof = 0
+# # Count the free degrees of freedom (Size of the stiffness matrix)
+# active_dof = 0
 
-for i in range(0,nnd):
-	for j in range(0,nodof):
-		if nf[i,j] != 0:
-			active_dof=active_dof+1
-			nf[i,j]=active_dof
+# for i in range(0,nnd):
+	# for j in range(0,nodof):
+		# if nf[i,j] != 0:
+			# active_dof=active_dof+1
+			# nf[i,j]=active_dof
 
-# -------
-# Loading
-# -------
+# # -------
+# # Loading
+# # -------
 
-# Read the node sets where the concentrated load sets are applied
-[Cload_NodeSet_list, Cload_dof_mag]= STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
+# # Read the node sets where the concentrated load sets are applied
+# [Cload_NodeSet_list, Cload_dof_mag]= STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
 
-# Apply the actual loading
-Nodal_loads = STDLIB.apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
-
-
-# ------------------------------------------------------------------------------
-# Assemble the global force vector
-# This force vector will have one column and active_dof-rows
-
-force_global = np.zeros(shape=(active_dof,1))
-
-for i in range(0,nnd):
-
-	if nf[i][0] != 0:
-		force_global[int(nf[i][0])-1] = Nodal_loads[i][0]
-
-	if nf[i][1] != 0:
-		force_global[int(nf[i][1])-1] = Nodal_loads[i][1]
+# # Apply the actual loading
+# Nodal_loads = STDLIB.apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
 
 
-# -----------------------------------------------------------------------------
-# Assembly of the global stiffness matrix
-# -----------------------------------------------------------------------------
+# # ------------------------------------------------------------------------------
+# # Assemble the global force vector
+# # This force vector will have one column and active_dof-rows
 
-# Collect the sampling points
-samp = STDLIB.gaussPoints(num_gauss_points)
+# force_global = np.zeros(shape=(active_dof,1))
 
-# Initialize the global stiffness matrix
-KK = np.zeros(shape=(active_dof,active_dof))
+# for i in range(0,nnd):
+
+	# if nf[i][0] != 0:
+		# force_global[int(nf[i][0])-1] = Nodal_loads[i][0]
+
+	# if nf[i][1] != 0:
+		# force_global[int(nf[i][1])-1] = Nodal_loads[i][1]
 
 
-# Form the element stiffness matrix and then assemble the global stiffness matrix
-for i in range(0,nel):
-	# Extract the coordinates of the element and the steering vector
-	[coords,g] = STDLIB.elem_Q4(i,Nodes,Elements[0],nne,nodof,nf)
+# # -----------------------------------------------------------------------------
+# # Assembly of the global stiffness matrix
+# # -----------------------------------------------------------------------------
 
-	# Initialize the element stiffness matrix
-	ke = np.zeros(shape=(eldof,eldof))
+# # Collect the sampling points
+# samp = STDLIB.gaussPoints(num_gauss_points)
 
-	# Calculate the element stiffness matrix at each Gauss point
-	for ig in range(0,num_gauss_points):
-		for jg in range(0,num_gauss_points):
+# # Initialize the global stiffness matrix
+# KK = np.zeros(shape=(active_dof,active_dof))
 
-			[der_xi_eta, shapeFun] = STDLIB.fmQ4_lin(samp,ig,jg)
 
-			# For the jacobian matrix
-			jac = der_xi_eta.dot(coords)
+# # Form the element stiffness matrix and then assemble the global stiffness matrix
+# for i in range(0,nel):
+	# # Extract the coordinates of the element and the steering vector
+	# [coords,g] = STDLIB.elem_Q4(i,Nodes,Elements[0],nne,nodof,nf)
 
-			# Compute the inverse of the Jacobian matrix
-			jac_inv = inv(jac)
+	# # Initialize the element stiffness matrix
+	# ke = np.zeros(shape=(eldof,eldof))
 
-			# Compute the derivatives of the shape functions 
-			der_x_y = jac_inv.dot(der_xi_eta)
+	# # Calculate the element stiffness matrix at each Gauss point
+	# for ig in range(0,num_gauss_points):
+		# for jg in range(0,num_gauss_points):
 
-			# Form the B-matrix
-			bee = STDLIB.formbee_Q4_lin(der_x_y,nne,eldof)
+			# [der_xi_eta, shapeFun] = STDLIB.fmQ4_lin(samp,ig,jg)
 
-			# Integrate the stiffness matrix
-			wi = samp[ig][1]
-			wj = samp[ig][1]
-			d = np.linalg.det(jac)
+			# # For the jacobian matrix
+			# jac = der_xi_eta.dot(coords)
 
-			ke = np.add(ke, reduce(np.dot, [d, thick, wi, wj, bee.transpose(), dee,bee]))
+			# # Compute the inverse of the Jacobian matrix
+			# jac_inv = inv(jac)
 
-	# Form the global stiffness matrix
-	KK = STDLIB.form_KK(KK,ke,g,eldof)
+			# # Compute the derivatives of the shape functions 
+			# der_x_y = jac_inv.dot(der_xi_eta)
+
+			# # Form the B-matrix
+			# bee = STDLIB.formbee_Q4_lin(der_x_y,nne,eldof)
+
+			# # Integrate the stiffness matrix
+			# wi = samp[ig][1]
+			# wj = samp[ig][1]
+			# d = np.linalg.det(jac)
+
+			# ke = np.add(ke, reduce(np.dot, [d, thick, wi, wj, bee.transpose(), dee,bee]))
+
+	# # Form the global stiffness matrix
+	# KK = STDLIB.form_KK(KK,ke,g,eldof)
 	
 
-# Invert the global stiffness matrix and find the unknown displacements
-delta = inv(KK).dot(force_global)
+# # Invert the global stiffness matrix and find the unknown displacements
+# delta = inv(KK).dot(force_global)
 
-# Seperate the displacements into its componenets
-# -----------------------------------------------
-node_disp = STDLIB.seprarate_disp(nodof,nnd,delta,nf)
+# # Seperate the displacements into its componenets
+# # -----------------------------------------------
+# node_disp = STDLIB.seprarate_disp(nodof,nnd,delta,nf)
 
-nodesFinal = Nodes[...,1:] + deform_factor*node_disp
+# nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 
 
-# Name of the output database
-name_output_db = name_ip_file + '.msh'
-POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements[0])
+# # Name of the output database
+# name_output_db = name_ip_file + '.msh'
+# POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements[0])
