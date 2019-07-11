@@ -8,7 +8,7 @@ from numpy.linalg import inv
 # INPUTS 
 # -----------------------------------------------------------------------------------------
 # The name of the input file
-input_file = 'TrussProblem.sinp'
+input_file = 'Beam_bending.sinp'
 
 # Post processign info
 deform_factor = 100000
@@ -52,7 +52,7 @@ nodof = currentElement.nodof
 # Number of degrees of freedom per element
 eldof = nne*nodof
 
-'''
+
 # Beam thickness in m
 thick = 0.01
 
@@ -111,6 +111,7 @@ for i in range(0,nnd):
 	if nf[i][1] != 0:
 		force_global[int(nf[i][1])-1] = Nodal_loads[i][1]
 
+
 # -----------------------------------------------------------------------------
 # Assembly of the global stiffness matrix
 # -----------------------------------------------------------------------------
@@ -121,10 +122,11 @@ samp = STDLIB.gaussPoints(num_gauss_points)
 # Initialize the global stiffness matrix
 KK = np.zeros(shape=(active_dof,active_dof))
 
+
 # Form the element stiffness matrix and then assemble the global stiffness matrix
 for i in range(0,nel):
 	# Extract the coordinates of the element and the steering vector
-	[coords,g] = STDLIB.elem_Q4(i,Nodes,Elements,nne,nodof,nf)
+	[coords,g] = STDLIB.elem_Q4(i,Nodes,Elements[0],nne,nodof,nf)
 
 	# Initialize the element stiffness matrix
 	ke = np.zeros(shape=(eldof,eldof))
@@ -156,6 +158,7 @@ for i in range(0,nel):
 
 	# Form the global stiffness matrix
 	KK = STDLIB.form_KK(KK,ke,g,eldof)
+	
 
 # Invert the global stiffness matrix and find the unknown displacements
 delta = inv(KK).dot(force_global)
@@ -169,5 +172,4 @@ nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 
 # Name of the output database
 name_output_db = name_ip_file + '.msh'
-POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements)
-'''
+POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements[0])

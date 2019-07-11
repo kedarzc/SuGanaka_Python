@@ -70,8 +70,7 @@ def elementsLibrary(nameElement):
 
 	return Element_current
 		
-
-	return AllElemsAvailable_nne[nameElement]
+	# return AllElemsAvailable_nne[nameElement]
 
 
 # This function reads the nodal coordinates
@@ -107,8 +106,9 @@ def readElements(all_lines,all_keywords,keyword_lines,all_asterix):
 	# Extract the element information
 	currentElement = elementsLibrary(elemType)
 		
-	Elements = np.zeros(shape=(ending_line-starting_line-1,currentElement.nodof+1))
-		
+	Elements = np.zeros(shape=(ending_line-starting_line-1,currentElement.nne+1))
+	
+	
 	Element_counter = 0
 	
 	if elemType == 'TD2':
@@ -211,18 +211,18 @@ def gaussPoints(ng):
 # the steering vector for the element
 def elem_Q4(elemNum,Nodes,Elements,nne,nodof,nf):
 
-        all_node_nos = Nodes[:,0]
-        
+	all_node_nos = Nodes[:,0]
+	
 	coordinates = np.zeros(shape=(nne,nodof))
 	g = np.zeros(shape=(1,nne*nodof))
-
+	
 	# Extract the coordinates of the element
 	l = 0
 	for k in range(0,nne):
 		for j in range(0,nodof):
 
-                        # Node number
-                        Node_num_index = np.where(all_node_nos==int(Elements[elemNum][k+1]))
+			# Node number
+			Node_num_index = np.where(all_node_nos==int(Elements[elemNum][k+1]))
                         
 			coordinates[k][j] = Nodes[Node_num_index,j+1]
 			g[0,l] = nf[Node_num_index,j]
