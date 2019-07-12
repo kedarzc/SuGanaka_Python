@@ -109,15 +109,15 @@ for i in range(0,nnd):
 			force_global[int(nf[i][j])-1] = Nodal_loads[i][j]
 
 
-# # -----------------------------------------------------------------------------
-# # Assembly of the global stiffness matrix
-# # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Assembly of the global stiffness matrix
+# -----------------------------------------------------------------------------
 
-# # Collect the sampling points
-# samp = STDLIB.gaussPoints(num_gauss_points)
+# Collect the sampling points
+samp = STDLIB.gaussPoints(num_gauss_points)
 
-# # Initialize the global stiffness matrix
-# KK = np.zeros(shape=(active_dof,active_dof))
+# Initialize the global stiffness matrix
+KK = np.zeros(shape=(active_dof,active_dof))
 
 
 # # Form the element stiffness matrix and then assemble the global stiffness matrix
