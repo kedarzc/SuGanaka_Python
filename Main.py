@@ -77,21 +77,21 @@ BCS_NodeSet = STDLIB.read_BCS(all_lines,all_keywords,keyword_lines,all_asterix)
 # Apply the Boundary Conditions
 nf = STDLIB.apply_BCS(nnd,nodof,Nodes,NodeSets,BCS_NodeSet)
 
-# # Count the free degrees of freedom (Size of the stiffness matrix)
-# active_dof = 0
+# Count the free degrees of freedom (Size of the stiffness matrix)
+active_dof = 0
 
-# for i in range(0,nnd):
-	# for j in range(0,nodof):
-		# if nf[i,j] != 0:
-			# active_dof=active_dof+1
-			# nf[i,j]=active_dof
+for i in range(0,nnd):
+	for j in range(0,nodof):
+		if nf[i,j] != 0:
+			active_dof=active_dof+1
+			nf[i,j]=active_dof
 
-# # -------
-# # Loading
-# # -------
+# -------
+# Loading
+# -------
 
-# # Read the node sets where the concentrated load sets are applied
-# [Cload_NodeSet_list, Cload_dof_mag]= STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
+# Read the node sets where the concentrated load sets are applied
+[Cload_NodeSet_list, Cload_dof_mag]= STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
 
 # # Apply the actual loading
 # Nodal_loads = STDLIB.apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag)

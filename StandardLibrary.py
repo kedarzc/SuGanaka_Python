@@ -438,7 +438,7 @@ def apply_BCS(nnd,nodof,Nodes,NodeSets,BCS_NodeSet):
                         # The node number on which the BCS is being applied
                         Node_num = NodeSets[BCS_keys[i]][j]
 
-                        # find the index of the node number
+                        # find the index of the node number from ALL NODES
                         Node_num_index = np.where(all_node_nos==Node_num)
                         
                         for k in range(0,len(BCS_NodeSet[BCS_keys[i]])):

@@ -25,9 +25,7 @@
 ** BOUNDARY CONDITIONS
 **
 *Boundary
-BCS, 1
-BCS, 2
-BCS, 3
+BCS, 1,2,3
 **
 ** LOADS
 ** 
