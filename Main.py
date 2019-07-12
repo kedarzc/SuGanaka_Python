@@ -96,20 +96,17 @@ for i in range(0,nnd):
 # Apply the actual loading
 Nodal_loads = STDLIB.apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
 
+# ------------------------------------------------------------------------------
+# Assemble the global force vector
+# This force vector will have one column and active_dof-rows
 
-# # ------------------------------------------------------------------------------
-# # Assemble the global force vector
-# # This force vector will have one column and active_dof-rows
+force_global = np.zeros(shape=(active_dof,1))
 
-# force_global = np.zeros(shape=(active_dof,1))
+for i in range(0,nnd):
 
-# for i in range(0,nnd):
-
-	# if nf[i][0] != 0:
-		# force_global[int(nf[i][0])-1] = Nodal_loads[i][0]
-
-	# if nf[i][1] != 0:
-		# force_global[int(nf[i][1])-1] = Nodal_loads[i][1]
+	for j in range(0,nodof):
+		if nf[i][0] != 0:
+			force_global[int(nf[i][j])-1] = Nodal_loads[i][j]
 
 
 # # -----------------------------------------------------------------------------
