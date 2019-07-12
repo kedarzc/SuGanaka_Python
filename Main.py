@@ -93,8 +93,8 @@ for i in range(0,nnd):
 # Read the node sets where the concentrated load sets are applied
 [Cload_NodeSet_list, Cload_dof_mag]= STDLIB.read_Cloads(all_lines,all_keywords,keyword_lines,all_asterix)
 
-# # Apply the actual loading
-# Nodal_loads = STDLIB.apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
+# Apply the actual loading
+Nodal_loads = STDLIB.apply_cloads(nnd,nodof,Nodes,NodeSets,Cload_NodeSet_list,Cload_dof_mag)
 
 
 # # ------------------------------------------------------------------------------
