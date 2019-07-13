@@ -36,7 +36,7 @@ def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 	starting_line = nodal_keyword_line
 	ending_line = next_line
 	        
-	Nodes = np.zeros(shape=(ending_line-starting_line-1,3))
+	Nodes = np.zeros(shape=(ending_line-starting_line-1,4))
 
 	Nodal_counter = 0
 
@@ -44,7 +44,8 @@ def readNodes(all_lines,all_keywords,keyword_lines,all_asterix):
 		Nodes[Nodal_counter,0] = float(all_lines[i-1].split(',')[0])
 		Nodes[Nodal_counter,1] = float(all_lines[i-1].split(',')[1])
 		Nodes[Nodal_counter,2] = float(all_lines[i-1].split(',')[2])
-	        
+		Nodes[Nodal_counter,3] = float(all_lines[i-1].split(',')[3])
+
 		Nodal_counter = Nodal_counter + 1
 
 	return Nodes
@@ -190,45 +191,44 @@ def parseKeywords(fileName):
 	return keyword_lines, all_keywords,comment_lines, all_asterix
 
 
-def gaussPoints(ng):
+# def gaussPoints(ng):
 
-	# This function returns the abcissae and the weights of the Gauss points 
-	# for number of gauss points
+# 	# This function returns the abcissae and the weights of the Gauss points 
+# 	# for number of gauss points
 
-	samp = np.zeros(shape=(ng,2))
+# 	samp = np.zeros(shape=(ng,2))
 
-	# Nomenclature --> samp[abcissa,weight]
+# 	# Nomenclature --> samp[abcissa,weight]
 
-	if ng == 1:
+# 	if ng == 1:
 
-		samp[0,0] = 0.0
+# 		samp[0,0] = 0.0
+# 		samp[0,1] = 2.0
 
-		samp[0,1] = 2.0
+# 	if ng == 2:
 
-	if ng == 2:
+# 		samp[0,0] = -1.0/math.sqrt(3.0) 
+# 		samp[1,0] = 1.0/math.sqrt(3.0)
 
-		samp[0,0] = -1.0/math.sqrt(3.0) 
-		samp[1,0] = 1.0/math.sqrt(3.0)
+# 		samp[0,1] = 1.0 
+# 		samp[1,1] = 1.0
 
-		samp[0,1] = 1.0 
-		samp[1,1] = 1.0
+# 	if ng == 3:
 
-	if ng == 3:
-
-		samp[0,0] = -2.0/math.sqrt(15.0)
-		samp[1,0] = 0.0
-		samp[2,0] = +2.0/math.sqrt(15.0)
+# 		samp[0,0] = -2.0/math.sqrt(15.0)
+# 		samp[1,0] = 0.0
+# 		samp[2,0] = +2.0/math.sqrt(15.0)
  
-		samp[0,1] = 5.0/9.0
-		samp[1,1] = 8.0/9.0
-		samp[2,1] = 5.0/9.0
+# 		samp[0,1] = 5.0/9.0
+# 		samp[1,1] = 8.0/9.0
+# 		samp[2,1] = 5.0/9.0
 
-	return samp
+# 	return samp
 
 
 # Extract the coordinates for the Q4 element and 
 # the steering vector for the element
-def elem_Q4(elemNum,Nodes,Elements,nne,nodof,nf):
+def elem_coordinates(elemNum,Nodes,Elements,nne,nodof,nf):
 
 	all_node_nos = Nodes[:,0]
 	
@@ -238,6 +238,7 @@ def elem_Q4(elemNum,Nodes,Elements,nne,nodof,nf):
 	# Extract the coordinates of the element
 	l = 0
 	for k in range(0,nne):
+
 		for j in range(0,nodof):
 
 			# Node number
@@ -257,6 +258,9 @@ def fmQ4_lin(samp,ig,jg):
 
 	xi  = samp[ig][0]
 	eta = samp[ig][1]
+
+	print xi
+	print eta
 
 	# Make this arbitrary
 	fun = np.zeros(shape=(4,1))
@@ -549,4 +553,208 @@ def read_elastic_material(all_lines,all_keywords,keyword_lines,all_asterix):
 	return E,nu
 
 
+# Shape functions for C3D8 element
+def gaussPoints(nip):
 
+	if nip == 8:
+
+		s = np.zeros(shape=(8,3))
+		root3=1.0/math.sqrt(3)
+
+		# These are the shape functions
+		s[0,0]=-root3; s[0,1]= root3; s[0,2]= root3
+		s[1,0]=-root3; s[1,1]=-root3; s[1,2]=+root3
+		s[2,0]=-root3; s[2,1]=-root3; s[2,2]=-root3
+		s[3,0]=-root3; s[3,1]=+root3; s[3,2]=-root3
+		s[4,0]= root3; s[4,1]= root3; s[4,2]= root3
+		s[5,0]= root3; s[5,1]=-root3; s[5,2]= root3
+		s[6,0]= root3; s[6,1]=-root3; s[6,2]=-root3
+		s[7,0]= root3; s[7,1]= root3; s[7,2]=-root3
+
+	return s
+
+
+def shape_functions(nip,samp,int_point):
+
+	if nip == 8:
+
+		xi   = samp[int_point,0]
+		eta  = samp[int_point,1]
+		zeta = samp[int_point,2]
+		
+		one   = 1.0
+		pt125 = 0.125
+
+		der = np.zeros(shape=(3,8))
+
+		der[0,0]=-pt125*(1+eta)*(1+zeta)   
+		der[0,1]=-pt125*(1-eta)*(1+zeta)
+		der[0,2]=-pt125*(1-eta)*(1-zeta)
+		der[0,3]=-pt125*(1+eta)*(1-zeta)
+		der[0,4]= pt125*(1+eta)*(1+zeta)   
+		der[0,5]= pt125*(1-eta)*(1+zeta)
+		der[0,6]= pt125*(1-eta)*(1-zeta)   
+		der[0,7]= pt125*(1+eta)*(1-zeta)
+
+		der[1,0]= pt125*(1-xi)*(1+zeta)  
+		der[1,1]=-pt125*(1-xi)*(1+zeta)
+		der[1,2]=-pt125*(1-xi)*(1-zeta)   
+		der[1,3]= pt125*(1-xi)*(1-zeta)
+		der[1,4]= pt125*(1+xi)*(1+zeta)    
+		der[1,5]=-pt125*(1+xi)*(1+zeta)
+		der[1,6]=-pt125*(1+xi)*(1-zeta)    
+		der[1,7]= pt125*(1+xi)*(1-zeta)
+
+		der[2,0]= pt125*(1-xi)*(1+eta)   
+		der[2,1]= pt125*(1-xi)*(1-eta)
+		der[2,2]=-pt125*(1-xi)*(1-eta)     
+		der[2,3]=-pt125*(1-xi)*(1+eta)
+		der[2,4]= pt125*(1+xi)*(1+eta)    
+		der[2,5]= pt125*(1+xi)*(1-eta)
+		der[2,6]=-pt125*(1+xi)*(1-eta)     
+		der[2,7]=-pt125*(1+xi)*(1+eta)
+
+	return der
+
+
+def formbee_C3D8_lin(derN_x_y_z,nne,eldof):
+
+	B  = np.zeros(shape=(6,24))
+
+	# Assemble the B-matrix
+	# ---------------------
+
+	# First row 
+	B[0,0] = derN_x_y_z[0,0]
+	B[0,3] = derN_x_y_z[0,1]
+	B[0,6] = derN_x_y_z[0,2]
+	B[0,9] = derN_x_y_z[0,3]
+	B[0,12] = derN_x_y_z[0,4]
+	B[0,15] = derN_x_y_z[0,5]
+	B[0,18] = derN_x_y_z[0,6]
+	B[0,21] = derN_x_y_z[0,7]
+
+	# Second row
+	B[1,1] = derN_x_y_z[1,0]
+	B[1,4] = derN_x_y_z[1,1]
+	B[1,7] = derN_x_y_z[1,2]
+	B[1,10] = derN_x_y_z[1,3]
+	B[1,13] = derN_x_y_z[1,4]
+	B[1,16] = derN_x_y_z[1,5]
+	B[1,19] = derN_x_y_z[1,6]
+	B[1,22] = derN_x_y_z[1,7]
+
+	# Third row
+	B[2,2] = derN_x_y_z[2,0]
+	B[2,5] = derN_x_y_z[2,1]
+	B[2,8] = derN_x_y_z[2,2]
+	B[2,11] = derN_x_y_z[2,3]
+	B[2,14] = derN_x_y_z[2,4]
+	B[2,17] = derN_x_y_z[2,5]
+	B[2,20] = derN_x_y_z[2,6]
+	B[2,23] = derN_x_y_z[2,7]
+
+	# Fourth row
+	B[3,0] = derN_x_y_z[1,0]
+	B[3,1] = derN_x_y_z[0,0]
+	B[3,2] = 0;
+
+	B[3,3] = derN_x_y_z[1,1]
+	B[3,4] = derN_x_y_z[0,1]
+	B[3,5] = 0;
+
+	B[3,6] = derN_x_y_z[1,2]
+	B[3,7] = derN_x_y_z[0,2]
+	B[3,8] = 0;
+
+	B[3,9] = derN_x_y_z[1,3]
+	B[3,10] = derN_x_y_z[0,3]
+	B[3,11] = 0;
+
+	B[3,12] = derN_x_y_z[1,4]
+	B[3,13] = derN_x_y_z[0,4]
+	B[3,14] = 0;
+
+	B[3,15] = derN_x_y_z[1,5]
+	B[3,16] = derN_x_y_z[0,5]
+	B[3,17] = 0;
+
+	B[3,18] = derN_x_y_z[1,6]
+	B[3,19] = derN_x_y_z[0,6]
+	B[3,20] = 0;
+
+	B[3,21] = derN_x_y_z[1,7]
+	B[3,22] = derN_x_y_z[0,7]
+	B[3,23] = 0;
+
+	# Fifth row
+	B[5,0] = derN_x_y_z[2,0]
+	B[5,1] = 0;
+	B[5,2] = derN_x_y_z[2,0]
+
+	B[5,3] = derN_x_y_z[2,1]
+	B[5,4] = 0;
+	B[5,5] = derN_x_y_z[0,1]
+
+	B[5,6] = derN_x_y_z[2,2]
+	B[5,7] = 0;
+	B[5,8] = derN_x_y_z[0,2]
+
+	B[5,9] = derN_x_y_z[2,3]
+	B[5,10] = 0;
+	B[5,11] = derN_x_y_z[0,3]
+
+	B[5,12] = derN_x_y_z[2,4]
+	B[5,13] = 0;
+	B[5,14] = derN_x_y_z[0,4]
+
+	B[5,15] = derN_x_y_z[2,5]
+	B[5,16] = 0;
+	B[5,17] = derN_x_y_z[0,5]
+
+	B[5,18] = derN_x_y_z[2,6]
+	B[5,19] = 0;
+	B[5,20] = derN_x_y_z[0,6]
+
+	B[5,21] = derN_x_y_z[2,7]
+	B[5,22] = 0;
+	B[5,23] = derN_x_y_z[0,7]
+
+
+	# Sixth row
+	B[4,0] = 0;
+	B[4,1] = derN_x_y_z[2,0]
+	B[4,2] = derN_x_y_z[1,0]
+
+	B[4,3] = 0;
+	B[4,4] = derN_x_y_z[2,1]
+	B[4,5] = derN_x_y_z[1,1]
+
+	B[4,6] = 0;
+	B[4,7] = derN_x_y_z[2,2]
+	B[4,8] = derN_x_y_z[1,2]
+
+	B[4,19] = 0;
+	B[4,10] = derN_x_y_z[2,3]
+	B[4,11] = derN_x_y_z[1,3]
+
+	B[4,12] = 0;
+	B[4,13] = derN_x_y_z[2,4]
+	B[4,14] = derN_x_y_z[1,4]
+
+	B[4,15] = 0;
+	B[4,16] = derN_x_y_z[2,5]
+	B[4,17] = derN_x_y_z[1,5]
+
+	B[4,18] = 0;
+	B[4,19] = derN_x_y_z[2,6]
+	B[4,20] = derN_x_y_z[1,6]
+
+	B[4,21] = 0;
+	B[4,22] = derN_x_y_z[2,7]
+	B[4,23] = derN_x_y_z[1,7]
+
+	return B
+
+    
+    

@@ -9,6 +9,7 @@ from numpy.linalg import inv
 # -----------------------------------------------------------------------------------------
 # The name of the input file
 input_file = 'BrickElement.sinp'
+#	input_file = 'Beam_bending.sinp'
 
 # Post processign info
 deform_factor = 100000
@@ -57,10 +58,11 @@ eldof = nne*nodof
 thick = 0.01
 
 # Number of sampling points
-num_gauss_points = 2;
+num_gauss_points = 2
+nip = 8 
 
 # Form the elastic matrix for plane stress
-dee = STDMTLLIB.formdsig(E,nu)
+dee = STDMTLLIB.formdsig(E,nu,nip)
 
 # Create Node sets
 # ----------------
@@ -114,25 +116,50 @@ for i in range(0,nnd):
 # -----------------------------------------------------------------------------
 
 # Collect the sampling points
-samp = STDLIB.gaussPoints(num_gauss_points)
+samp = STDLIB.gaussPoints(nip)
 
 # Initialize the global stiffness matrix
 KK = np.zeros(shape=(active_dof,active_dof))
 
 
-# # Form the element stiffness matrix and then assemble the global stiffness matrix
-# for i in range(0,nel):
-	# # Extract the coordinates of the element and the steering vector
-	# [coords,g] = STDLIB.elem_Q4(i,Nodes,Elements[0],nne,nodof,nf)
+# Form the element stiffness matrix and then assemble the global stiffness matrix
+for i in range(0,nel):
+	# Extract the coordinates of the element and the steering vector
+	[coords,g] = STDLIB.elem_coordinates(i,Nodes,Elements[0],nne,nodof,nf)
 
-	# # Initialize the element stiffness matrix
-	# ke = np.zeros(shape=(eldof,eldof))
+	# Initialize the element stiffness matrix
+	ke = np.zeros(shape=(eldof,eldof))
 
-	# # Calculate the element stiffness matrix at each Gauss point
+	# # Calculate the element stiffness matrix at each integration point
+
+	for int_point in range(0,8): 
+
+		dN_xi_eta_mu = STDLIB.shape_functions(nip,samp,int_point)
+
+		# Form the jacobian matrix
+		jac = dN_xi_eta_mu.dot(coords)
+
+		# Compute the inverse of the Jacobian matrix
+		jac_inv = inv(jac)
+
+		# # Compute the derivatives of the shape functions 
+		dN_x_y_z = jac_inv.dot(dN_xi_eta_mu)
+
+		# Form the B-matrix
+		bee = STDLIB.formbee_C3D8_lin(dN_x_y_z,nne,eldof)
+
+		# Integrate the stiffness matrix
+		wi = 1.0
+		wj = 1.0
+		d = np.linalg.det(jac)
+
+		ke = np.add(ke, reduce(np.dot, [d, wi, wj, bee.transpose(), dee,bee]))
+
+
 	# for ig in range(0,num_gauss_points):
-		# for jg in range(0,num_gauss_points):
+	# 	for jg in range(0,num_gauss_points):
 
-			# [der_xi_eta, shapeFun] = STDLIB.fmQ4_lin(samp,ig,jg)
+	# 		[der_xi_eta, shapeFun] = STDLIB.fmQ4_lin(samp,ig,jg)
 
 			# # For the jacobian matrix
 			# jac = der_xi_eta.dot(coords)
@@ -153,16 +180,16 @@ KK = np.zeros(shape=(active_dof,active_dof))
 
 			# ke = np.add(ke, reduce(np.dot, [d, thick, wi, wj, bee.transpose(), dee,bee]))
 
-	# # Form the global stiffness matrix
-	# KK = STDLIB.form_KK(KK,ke,g,eldof)
+	# Form the global stiffness matrix
+	KK = STDLIB.form_KK(KK,ke,g,eldof)
 	
 
-# # Invert the global stiffness matrix and find the unknown displacements
-# delta = inv(KK).dot(force_global)
+# Invert the global stiffness matrix and find the unknown displacements
+delta = inv(KK).dot(force_global)
 
-# # Seperate the displacements into its componenets
-# # -----------------------------------------------
-# node_disp = STDLIB.seprarate_disp(nodof,nnd,delta,nf)
+# Seperate the displacements into its componenets
+# -----------------------------------------------
+node_disp = STDLIB.seprarate_disp(nodof,nnd,delta,nf)
 
 # nodesFinal = Nodes[...,1:] + deform_factor*node_disp
 
