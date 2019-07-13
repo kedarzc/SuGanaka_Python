@@ -9,10 +9,7 @@ from numpy.linalg import inv
 # -----------------------------------------------------------------------------------------
 # The name of the input file
 input_file = 'BrickElement.sinp'
-#	input_file = 'Beam_bending.sinp'
-
-# Post processign info
-deform_factor = 100000
+# input_file = 'Beam_bending.sinp'
 
 # -----------------------------------------------------------------------------------------
 # INPUTS END
@@ -191,9 +188,10 @@ delta = inv(KK).dot(force_global)
 # -----------------------------------------------
 node_disp = STDLIB.seprarate_disp(nodof,nnd,delta,nf)
 
-# nodesFinal = Nodes[...,1:] + deform_factor*node_disp
+nodesFinal = Nodes[...,1:]
 
 
-# # Name of the output database
-# name_output_db = name_ip_file + '.msh'
-# POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,Elements[0])
+# Name of the output database
+name_output_db = name_ip_file + '.msh'
+POSTPRO.write_gmsh_file(name_output_db,nnd,Nodes,nodesFinal,node_disp,nel,currentElement.name_of_Element,
+	Elements[0])
