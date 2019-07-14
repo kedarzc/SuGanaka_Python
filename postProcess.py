@@ -1,3 +1,4 @@
+import math
 
 def write_gmsh_file(nameFile,nnd,Nodes,nodesFinal,node_disp,nel,elemName,Elements):
 
@@ -28,20 +29,24 @@ def write_gmsh_file(nameFile,nnd,Nodes,nodesFinal,node_disp,nel,elemName,Element
 	# Gmsh Element information
 	gmshfile.write('$Elements\n')
 	gmshfile.write(str(nel) + str('\n'))
+	
+	for i in range(0,nel):
 
-	if elemName == 'C3D8':
-		ElemNum = int(Elements[i][0])
-		N1 = int(Elements[i][1])
-		N2 = int(Elements[i][2])
-		N3 = int(Elements[i][3])
-		N4 = int(Elements[i][4])
-		N5 = int(Elements[i][5])
-		N6 = int(Elements[i][6])
-		N7 = int(Elements[i][7])
-		N8 = int(Elements[i][8])
+		if elemName == 'C3D8':
 
-		gmshfile.write(str(ElemNum) +' '+ '5 2 99 2' +' '+ str(N1) +' '+ str(N2) +' '+ str(N3) +' '+ str(N4) +' '+ str(N1) +' '+ str(N2) +' '+ str(N3) +' '+ str(N4))
-		gmshfile.write('\n')
+			ElemNum = int(Elements[i][0])
+
+			N1 = int(Elements[i][1])
+			N2 = int(Elements[i][2])
+			N3 = int(Elements[i][3])
+			N4 = int(Elements[i][4])
+			N5 = int(Elements[i][5])
+			N6 = int(Elements[i][6])
+			N7 = int(Elements[i][7])
+			N8 = int(Elements[i][8])
+
+			gmshfile.write(str(ElemNum) +' '+ '5 2 99 2' +' '+ str(N1) +' '+ str(N2) +' '+ str(N3) +' '+ str(N4) +' '+ str(N5) +' '+ str(N6) +' '+ str(N7) +' '+ str(N8))
+			gmshfile.write('\n')
 
 	# gmshfile.write('$End'+'Elements\n')
 	# for i in range(0,nel):
@@ -55,31 +60,67 @@ def write_gmsh_file(nameFile,nnd,Nodes,nodesFinal,node_disp,nel,elemName,Element
 	# 	gmshfile.write(str(ElemNum) +' '+ '3 2 99 2' +' '+ str(N1) +' '+ str(N2) +' '+ str(N3) +' '+ str(N4))
 	# 	gmshfile.write('\n')
 
-	# gmshfile.write('$End'+'Elements\n')
+	gmshfile.write('$End'+'Elements\n')
 	
-	# # -------------
-	# # Gmsh NodeData
-	# # -------------
-	# gmshfile.write('$NodeData\n')
+	# -------------
+	# Gmsh NodeData
+	# -------------
 
-	# # Type of output
-	# gmshfile.write(str(1) + '\n' + '"U2"\n')
+	displacement_strings = ["U1","U2","U3","U"]
 
-	# # Time
-	# gmshfile.write(str(1) + '\n' + '0.0\n')
 
-	# gmshfile.write(str(3) + '\n' + '0\n' + '1\n' + str(nnd) + '\n')
+	# Do this for initial step
+	for j in range(0,len(displacement_strings)):
 
-	# for i in range(0,nnd):
+		gmshfile.write('$NodeData\n')
 
-	# 	NodeNum = i+1
+		# Type of output
+		gmshfile.write(str(1) + '\n' + str(displacement_strings[j] + '\n'))
+
+		# Time
+		gmshfile.write(str(1) + '\n' + '0.0\n')
+
+		gmshfile.write(str(3) + '\n' + '0\n' + '1\n' + str(nnd) + '\n')
+
+		for i in range(0,nnd):
+
+			NodeNum = i+1
+			U_step0 = 0.0
+			gmshfile.write(str(NodeNum) + ' ' + str(U_step0) + '\n')
+
+		gmshfile.write('$EndNodeData\n')
+
+	# Repeat for next steps
+	for j in range(0,len(displacement_strings)):
+
+		gmshfile.write('$NodeData\n')
+
+		# Type of output
+		gmshfile.write(str(1) + '\n' + str(displacement_strings[j] + '\n'))
+
+		# Time
+		gmshfile.write(str(1) + '\n' + '1.0\n')
+
+		gmshfile.write(str(3) + '\n' + '1\n' + '1\n' + str(nnd) + '\n')
+
+		for i in range(0,nnd):
+
+			NodeNum = i+1
+
+			if displacement_strings[j] == "U1":
+				U_stepN = node_disp[i][0]
+			
+			elif displacement_strings[j] == "U2":
+				U_stepN = node_disp[i][1]
+			
+			elif displacement_strings[j] == "U3":
+				U_stepN = node_disp[i][2]
+			
+			elif displacement_strings[j] == "U":
+				U_stepN = math.sqrt((node_disp[i][0])**2 + (node_disp[i][1])**2 + (node_disp[i][2])**2) 
+
+			gmshfile.write(str(NodeNum) + ' ' + str(U_stepN) + '\n')
+
+		gmshfile.write('$EndNodeData\n')
 		
-	# 	U1 = node_disp[i][0]
-	# 	U2 = node_disp[i][1]
-	# 	U3 = 0.0
-
-	# 	gmshfile.write(str(NodeNum) + ' ' + str(U2) + '\n')
-
-	# gmshfile.write('$EndNodeData\n')
-	
 	gmshfile.close()
