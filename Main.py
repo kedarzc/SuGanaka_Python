@@ -8,8 +8,7 @@ from numpy.linalg import inv
 # INPUTS 
 # -----------------------------------------------------------------------------------------
 # The name of the input file
-input_file = 'BrickElement.sinp'
-# input_file = 'Beam_bending.sinp'
+input_file = 'BrickBeam_Fine.sinp'
 
 # -----------------------------------------------------------------------------------------
 # INPUTS END
